@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-producer-job
+  namespace: jobs
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: gen-mock-data
+        # This is a locally built image
+        # needed to import it to k3s containerd `docker save kafka-producer:latest | sudo k3s ctr images import`
+        image: kafka-producer
+        imagePullPolicy: Never
+        env:
+          - name: KAFKA_SERVER
+            value: 'kafka.kafka.svc.cluster.local:9094'
+          - name: KAFKA_TOPIC
+            value: 'testy'
+          - name: NUM_MOCK_RECORDS
+            value: "1000"
+        # resources:
+        #   limits:
+        #     cpu: 250m
+        #     memory: 256Mi
+  backoffLimit: 0
